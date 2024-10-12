@@ -26,8 +26,8 @@ public class TestUser {
     @After
     public void deleteUser(){
         ValidatableResponse loginResponse = UserClient.login(UserCredentials.from(user)); //.body(accessToken, notNullValue());
-        if (loginResponse.extract().path("accessToken") != null){
-          String accessTokenFromResponse = loginResponse.extract().path("accessToken");
+        String accessTokenFromResponse = loginResponse.extract().path("accessToken");
+        if (accessTokenFromResponse != null){
           accessToken= accessTokenFromResponse.substring(7);
           UserClient.delete(accessToken);
         }
