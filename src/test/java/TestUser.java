@@ -11,6 +11,7 @@ import user.UserCredentials;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
 
 public class TestUser {
     private String accessToken;
@@ -24,11 +25,12 @@ public class TestUser {
 
     @After
     public void deleteUser(){
-        ValidatableResponse loginResponse = UserClient.login(UserCredentials.from(user))
-                .statusCode(200);
-        String accessTokenFromResponse = loginResponse.extract().path("accessToken");
-        accessToken= accessTokenFromResponse.substring(7);
-        UserClient.delete(accessToken);
+        ValidatableResponse loginResponse = UserClient.login(UserCredentials.from(user)); //.body(accessToken, notNullValue());
+        if (loginResponse.extract().path("accessToken") != null){
+          String accessTokenFromResponse = loginResponse.extract().path("accessToken");
+          accessToken= accessTokenFromResponse.substring(7);
+          UserClient.delete(accessToken);
+        }
     }
 
     @Test
@@ -36,10 +38,12 @@ public class TestUser {
     public void createUser(){
         UserClient.create(user)
                 .statusCode(200)
-                .body("success", equalTo(true));
+                .body("success", equalTo(true))
+                .body("accessToken", notNullValue());
         UserClient.login(UserCredentials.from(user))
                 .statusCode(200)
-                .body("success", equalTo(true));
+                .body("success", equalTo(true))
+                .body("accessToken", notNullValue());
     }
 
     @Test
